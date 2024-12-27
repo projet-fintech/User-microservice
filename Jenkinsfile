@@ -14,7 +14,7 @@ pipeline {
                 )
             }
         }
-        stage('Building') {
+        stage('Build') {
             steps {
                 // Assure-toi que c'est le bon répertoire
                     sh 'mvn clean install -DskipTests=true'
