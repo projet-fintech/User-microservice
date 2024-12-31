@@ -5,9 +5,9 @@ pipeline {
         jdk 'Java'
         dockerTool 'Docker'
     }
-   environment {
-    LIB_PATH = '/var/jenkins_home/workspace/events-lib/target/events-lib-1.0-SNAPSHOT.jar'
-}
+    environment {
+        LIB_PATH = '/var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar'
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -37,6 +37,3 @@ pipeline {
         }
     }
 }
-
-    
-
