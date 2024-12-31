@@ -3,15 +3,13 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder_service
 
 WORKDIR /app
 
-# Copier le fichier events-lib depuis le contexte Docker
-COPY events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
-
 # Copier les fichiers nécessaires pour construire le projet
 COPY pom.xml .
 COPY src ./src
+COPY repo ./repo
 
 # Configurer Maven pour utiliser le repository local
-RUN mvn clean install -DskipTests -Dmaven.repo.local=/app/repo
+RUN mvn clean install -DskipTests
 
 # Étape pour créer l'image finale
 FROM openjdk:21-jdk-slim
