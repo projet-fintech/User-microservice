@@ -6,8 +6,8 @@ pipeline {
         dockerTool 'Docker'
     }
     environment {
-        LIB_PATH = '/var/jenkins_home/artifacts/events-lib-1.0-SNAPSHOT.jar'
-    }
+    LIB_PATH = '/var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar'
+}
     stages {
         stage('Checkout') {
             steps {
