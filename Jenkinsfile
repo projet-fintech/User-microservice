@@ -6,7 +6,7 @@ pipeline {
         dockerTool 'Docker'
     }
     environment {
-        MAVEN_REPO_PATH = '/var/jenkins_home/shared-artifacts/repo'
+        LIB_PATH = '/var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar'
     }
     stages {
         stage('Checkout') {
@@ -22,24 +22,20 @@ pipeline {
             steps {
                 script {
                     waitUntil {
-                        fileExists("${env.MAVEN_REPO_PATH}/com/banque/events-lib/1.0-SNAPSHOT/events-lib-1.0-SNAPSHOT.jar")
+                        fileExists(env.LIB_PATH)
                     }
+                    sh 'mkdir -p docker-context'
+                    sh 'cp /var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar docker-context/events-lib-1.0-SNAPSHOT.jar'
+                    sh 'cp Dockerfile docker-context/Dockerfile'
+                    sh 'cp -R src pom.xml docker-context/'
                 }
-            }
-        }
-        stage('Build Microservice') {
-            steps {
-                sh '''
-                mvn clean install -DskipTests \
-                -Dmaven.repo.local=${MAVEN_REPO_PATH}
-                '''
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
                     def imageName = "user-microservice:${BUILD_NUMBER}"
-                    sh "docker build -t ${imageName} ."
+                    sh "docker build -t ${imageName} docker-context"
                 }
             }
         }
