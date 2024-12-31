@@ -4,11 +4,10 @@ WORKDIR /app
 
 COPY pom.xml .
 COPY src ./src
-COPY /var/jenkins_home/workspace/User-Micorservice/repo ./repo
+COPY /var/jenkins_home/artifacts/events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
 
-RUN  mvn clean install -DskipTests
+RUN mvn clean install -DskipTests
 
- # Construction de l'image finale
 FROM openjdk:21-jdk-slim
 
 WORKDIR /app
@@ -19,3 +18,4 @@ COPY --from=builder_service /app/lib/*.jar lib/
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
