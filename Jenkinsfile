@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
     tools {
@@ -18,7 +17,10 @@ pipeline {
          }
         stage('Build Docker Image') {
             steps {
-              sh 'docker build -t my-${JOB_NAME}:${BUILD_NUMBER} .'
+               script {
+                 def imageName = "my-${JOB_NAME.toLowerCase()}:${BUILD_NUMBER}"
+                 sh "docker build -t ${imageName} ."
+              }
             }
         }
     }
