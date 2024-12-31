@@ -20,11 +20,6 @@ pipeline {
               }
            }
            stage('Check Lib build') {
-              when {
-                expression {
-                    params.BUILD_LIB_SUCCESS == "true"
-                    }
-                }
                 steps {
                    script{
                      def repoPath = "/var/jenkins_home/workspace/User-Micorservice/repo"
