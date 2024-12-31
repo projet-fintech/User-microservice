@@ -29,5 +29,5 @@ COPY --from=builder_service /app/lib/*.jar lib/
 EXPOSE 8080
 
 # Lancer l'application
-ENTRYPOI
+ENTRYPOINT ["java", "-jar", "app.jar"]
 
