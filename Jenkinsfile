@@ -5,9 +5,6 @@ pipeline {
         jdk 'Java'
         dockerTool 'Docker'
     }
-    environment {
-        LIB_PATH = '/var/jenkins_home/workspace/events-lib/target/events-lib-1.0-SNAPSHOT.jar'
-    }
     stages {
         stage('Checkout') {
             steps {
@@ -18,14 +15,14 @@ pipeline {
                 )
             }
         }
-        stage('Wait for events-lib') {
+        stage('Prepare Dependencies') {
             steps {
                 script {
-                    waitUntil {
-                        fileExists(env.LIB_PATH)
-                    }
-                    // Copier le fichier dans le répertoire du build Docker
-                    sh 'cp /var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar ./events-lib-1.0-SNAPSHOT.jar'
+                    // Copier events-lib depuis le dossier shared-artifacts
+                    sh '''
+                        mkdir -p repo/com/banque/events-lib/1.0-SNAPSHOT
+                        cp /var/jenkins_home/shared-artifacts/repo/com/banque/events-lib/1.0-SNAPSHOT/events-lib-1.0-SNAPSHOT.jar ./events-lib-1.0-SNAPSHOT.jar
+                    '''
                 }
             }
         }
