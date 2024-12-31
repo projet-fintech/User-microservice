@@ -11,7 +11,7 @@ pipeline {
                  checkout scmGit(
                     branches: [[name: '*/main']],
                     extensions: [],
-                    userRemoteConfigs: [[credentialsId: 'ser3elah', url: 'https://github.com/projet-fintech/Authentification-Service.git']]
+                    userRemoteConfigs: [[credentialsId: 'ser3elah', url: 'https://github.com/projet-fintech/User-microservice.git']]
                 )
              }
         }
