@@ -7,8 +7,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Copier l'artefact généré par events-lib depuis le répertoire partagé
-COPY /var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
+# Copier l'artefact généré par events-lib dans le répertoire du build
+COPY events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
 
 # Construire le projet avec Maven
 RUN mvn clean install -DskipTests
