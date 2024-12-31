@@ -7,7 +7,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Copier l'artefact généré par events-lib dans le répertoire du build
+# Copier l'artefact généré par events-lib depuis le répertoire local (assurez-vous que le fichier est dans le même répertoire que le Dockerfile)
 COPY events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
 
 # Construire le projet avec Maven
@@ -21,7 +21,7 @@ WORKDIR /app
 # Copier l'application jar depuis l'étape précédente
 COPY --from=builder_service /app/target/*.jar app.jar
 
-# Copier la bibliothèque (events-lib)
+# Copier la bibliothèque (events-lib) depuis l'étape précédente
 COPY --from=builder_service /app/lib/*.jar lib/
 
 # Exposer le port
