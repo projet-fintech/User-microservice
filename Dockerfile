@@ -6,7 +6,6 @@ WORKDIR /app
 # Copier les fichiers nécessaires pour construire le projet
 COPY pom.xml .
 COPY src ./src
-COPY repo ./repo
 
 # Configurer Maven pour utiliser le repository local
 RUN mvn clean install -DskipTests
