@@ -7,9 +7,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Copier l'artefact généré par events-lib depuis le workspace Jenkins
-# Assurez-vous que le chemin soit correct
-COPY /var/jenkins_home/workspace/events-lib/target/events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
+# Copier l'artefact généré par events-lib depuis le répertoire partagé
+COPY /var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar ./lib/events-lib.jar
 
 # Construire le projet avec Maven
 RUN mvn clean install -DskipTests
@@ -30,4 +29,3 @@ EXPOSE 8080
 
 # Lancer l'application
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
