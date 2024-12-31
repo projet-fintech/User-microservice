@@ -1,11 +1,10 @@
-# Construction du projet User_service (build)
 FROM maven:3.9.6-eclipse-temurin-21 AS builder_service
 
 WORKDIR /app
 
 COPY pom.xml .
 COPY src ./src
-COPY repo ./repo
+COPY /var/jenkins_home/workspace/User-Micorservice/repo ./repo
 
 RUN  mvn clean install -DskipTests
 
