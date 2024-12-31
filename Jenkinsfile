@@ -6,7 +6,7 @@ pipeline {
         dockerTool 'Docker'
     }
     environment {
-        LIB_PATH = '/var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar'
+        LIB_PATH = '/var/jenkins_home/workspace/events-lib/target/events-lib-1.0-SNAPSHOT.jar'
     }
     stages {
         stage('Checkout') {
@@ -24,6 +24,8 @@ pipeline {
                     waitUntil {
                         fileExists(env.LIB_PATH)
                     }
+                    // Copier le fichier dans le répertoire du build Docker
+                    sh 'cp /var/jenkins_home/shared-artifacts/events-lib-1.0-SNAPSHOT.jar ./events-lib-1.0-SNAPSHOT.jar'
                 }
             }
         }
