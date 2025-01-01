@@ -9,7 +9,6 @@ pipeline {
         AWS_REGION = 'eu-west-3'
         ECR_REGISTRY = '329599629502.dkr.ecr.eu-west-3.amazonaws.com'
         IMAGE_NAME = 'user-microservice'
-        AWS_CREDENTIALS = credentials('aws-credentials')
     }
     stages {
         stage('Checkout') {
@@ -42,32 +41,35 @@ pipeline {
             }
         }
         
-        stage('Push to ECR') {
+       stage('Push to ECR') {
             steps {
                 script {
-                    docker.image('amazon/aws-cli').inside('--entrypoint=""') {
+                    withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                        
+                        def awsCredentials = "-e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
+                        
+                        docker.image('amazon/aws-cli').inside("--entrypoint='' ${awsCredentials}") {
+                            sh """
+                                aws ecr get-login-password --region ${AWS_REGION} > ecr_password.txt
+                            """
+                        }
+                        
+                        // Login à ECR
+                        sh "cat ecr_password.txt | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                        sh "rm ecr_password.txt"
+                        
+                        // Tag et push des images
+                        def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
+                        def ecrImageLatest = "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
+                        def ecrImageVersioned = "${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                        
                         sh """
-                            export AWS_ACCESS_KEY_ID=${AWS_CREDENTIALS_USR}
-                            export AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIALS_PSW}
-                            aws ecr get-login-password --region ${AWS_REGION} > ecr_password.txt
+                            docker tag ${localImageName} ${ecrImageLatest}
+                            docker tag ${localImageName} ${ecrImageVersioned}
+                            docker push ${ecrImageLatest}
+                            docker push ${ecrImageVersioned}
                         """
                     }
-                    
-                    // Login à ECR
-                    sh "cat ecr_password.txt | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
-                    sh "rm ecr_password.txt"
-                    
-                    // Tag et push des images
-                    def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
-                    def ecrImageLatest = "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
-                    def ecrImageVersioned = "${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}"
-                    
-                    sh """
-                        docker tag ${localImageName} ${ecrImageLatest}
-                        docker tag ${localImageName} ${ecrImageVersioned}
-                        docker push ${ecrImageLatest}
-                        docker push ${ecrImageVersioned}
-                    """
                 }
             }
         }
