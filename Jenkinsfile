@@ -9,6 +9,7 @@ pipeline {
         AWS_REGION = 'eu-west-3'
         ECR_REGISTRY = '329599629502.dkr.ecr.eu-west-3.amazonaws.com'
         IMAGE_NAME = 'user-microservice'
+        AWS_CREDENTIALS = credentials('aws-credentials')
     }
     stages {
         stage('Checkout') {
@@ -44,10 +45,19 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 script {
-                    // Login à ECR
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    docker.image('amazon/aws-cli').inside('--entrypoint=""') {
+                        sh """
+                            export AWS_ACCESS_KEY_ID=${AWS_CREDENTIALS_USR}
+                            export AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIALS_PSW}
+                            aws ecr get-login-password --region ${AWS_REGION} > ecr_password.txt
+                        """
+                    }
                     
-                    // Tag et push de l'image
+                    // Login à ECR
+                    sh "cat ecr_password.txt | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    sh "rm ecr_password.txt"
+                    
+                    // Tag et push des images
                     def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
                     def ecrImageLatest = "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
                     def ecrImageVersioned = "${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -65,7 +75,6 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    // Nettoyage des images locales
                     sh """
                         docker rmi ${IMAGE_NAME}:${BUILD_NUMBER} || true
                         docker rmi ${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} || true
@@ -73,6 +82,19 @@ pipeline {
                     """
                 }
             }
+        }
+    }
+    
+    post {
+        failure {
+            echo 'Pipeline failed! Cleaning up...'
+            sh 'rm -f ecr_password.txt || true'
+        }
+        success {
+            echo 'Pipeline succeeded! Image pushed to ECR.'
+        }
+        always {
+            cleanWs()
         }
     }
 }
