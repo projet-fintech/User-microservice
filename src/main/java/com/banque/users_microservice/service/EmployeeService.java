@@ -36,10 +36,10 @@ public class EmployeeService {
         newEmployee.setNationality(employee.getNationality());
         newEmployee.setTelephoneNumber(employee.getTelephoneNumber());
         newEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
-        employeeRepository.save(newEmployee);
-        userEventProducer.sendEmployeeEvent("CREATED",newEmployee);
+        Employee savedEmployee = employeeRepository.save(newEmployee);
+        userEventProducer.sendEmployeeEvent("CREATED",savedEmployee);
 
-        return newEmployee;
+        return savedEmployee;
     }
 
     public Optional<Employee> getEmployeeById(UUID id) {
@@ -59,10 +59,9 @@ public class EmployeeService {
             existingEmployee.setNationality(employee.getNationality());
             existingEmployee.setTelephoneNumber(employee.getTelephoneNumber());
             existingEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
-            employeeRepository.save(existingEmployee);
-            userEventProducer.sendEmployeeEvent("UPDATED",existingEmployee);
-
-            return existingEmployee;
+            Employee savedEmployee = employeeRepository.save(existingEmployee);
+            userEventProducer.sendEmployeeEvent("UPDATED",savedEmployee);
+            return savedEmployee;
         }
         return null;
     }

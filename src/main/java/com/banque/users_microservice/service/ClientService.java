@@ -37,10 +37,10 @@ public class ClientService {
         newClient.setAccountsIDs(client.getAccountsIDs());
         newClient.setStatus(client.getStatus());
 
-        clientRepository.save(newClient);
-        userEventProducer.sendClientEvent("CREATED",newClient);
+        Client savedClient = clientRepository.save(newClient);
+        userEventProducer.sendClientEvent("CREATED",savedClient);
 
-        return newClient;
+        return savedClient;
     }
 
     public Optional<Client> getClientById(UUID id) {
@@ -60,9 +60,9 @@ public class ClientService {
             existingClient.setTelephoneNumber(client.getTelephoneNumber());
             existingClient.setAccountsIDs(client.getAccountsIDs());
             existingClient.setStatus(client.getStatus());
-            clientRepository.save(existingClient);
-            userEventProducer.sendClientEvent("UPDATED",existingClient);
-            return existingClient;
+            Client savedClient = clientRepository.save(existingClient);
+            userEventProducer.sendClientEvent("UPDATED",savedClient);
+            return savedClient;
         }
         return null;
     }

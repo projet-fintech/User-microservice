@@ -1,0 +1,14 @@
+com/banque/users_microservice/entity/Client.class
+com/banque/users_microservice/service/EmployeeService.class
+com/banque/users_microservice/service/ClientService.class
+com/banque/users_microservice/producer/UserEventProducer.class
+com/banque/users_microservice/UsersMicroserviceApplication.class
+com/banque/users_microservice/entity/Employee.class
+com/banque/users_microservice/repository/AdminRepository.class
+com/banque/users_microservice/config/KafkaConfig.class
+com/banque/users_microservice/controller/ClientController.class
+com/banque/users_microservice/repository/ClientRepository.class
+com/banque/users_microservice/entity/Status.class
+com/banque/users_microservice/repository/EmployeeRepository.class
+com/banque/users_microservice/controller/EmployeeController.class
+com/banque/users_microservice/entity/Admin.class

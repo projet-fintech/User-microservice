@@ -1,0 +1,5 @@
+com/banque/users_microservice/UsersMicroserviceApplicationTests.class
+com/banque/users_microservice/controller/EmployeeControllerIT.class
+com/banque/users_microservice/controller/ClientControllerIT.class
+com/banque/users_microservice/service/EmployeeServiceTest.class
+com/banque/users_microservice/service/ClientServiceTest.class

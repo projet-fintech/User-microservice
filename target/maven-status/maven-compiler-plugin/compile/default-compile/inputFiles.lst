@@ -1,0 +1,14 @@
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/UsersMicroserviceApplication.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/config/KafkaConfig.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/controller/ClientController.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/controller/EmployeeController.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/entity/Admin.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/entity/Client.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/entity/Employee.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/entity/Status.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/producer/UserEventProducer.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/repository/AdminRepository.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/repository/ClientRepository.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/repository/EmployeeRepository.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/service/ClientService.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/main/java/com/banque/users_microservice/service/EmployeeService.java

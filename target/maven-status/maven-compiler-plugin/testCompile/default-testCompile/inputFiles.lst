@@ -1,0 +1,5 @@
+/home/mouad/Projet-Fin-Tech/User-microservice/src/test/java/com/banque/users_microservice/UsersMicroserviceApplicationTests.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/test/java/com/banque/users_microservice/controller/ClientControllerIT.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/test/java/com/banque/users_microservice/controller/EmployeeControllerIT.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/test/java/com/banque/users_microservice/service/ClientServiceTest.java
+/home/mouad/Projet-Fin-Tech/User-microservice/src/test/java/com/banque/users_microservice/service/EmployeeServiceTest.java

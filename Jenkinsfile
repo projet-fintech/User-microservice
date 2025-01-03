@@ -10,6 +10,7 @@ pipeline {
         ECR_REGISTRY = '329599629502.dkr.ecr.eu-west-3.amazonaws.com'
         IMAGE_NAME = 'user-microservice'
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -31,7 +32,10 @@ pipeline {
                 }
             }
         }
-        
+         stage('test_Unitaire'){
+                sh "mvn test"
+            }
+
         stage('Build Docker Image') {
             steps {
                 script {
