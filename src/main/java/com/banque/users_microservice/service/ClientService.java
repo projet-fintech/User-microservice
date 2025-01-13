@@ -4,7 +4,6 @@ package com.banque.users_microservice.service;
 import com.banque.users_microservice.entity.Client;
 import com.banque.users_microservice.producer.UserEventProducer;
 import com.banque.users_microservice.repository.ClientRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +15,12 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final UserEventProducer userEventProducer;
-    private final PasswordEncoder passwordEncoder;
 
-    public ClientService(ClientRepository clientRepository, UserEventProducer userEventProducer, PasswordEncoder passwordEncoder) {
+
+    public ClientService(ClientRepository clientRepository, UserEventProducer userEventProducer) {
         this.clientRepository = clientRepository;
         this.userEventProducer= userEventProducer;
-        this.passwordEncoder = passwordEncoder;
+
     }
 
     public Client createClient(Client client) {
@@ -31,7 +30,7 @@ public class ClientService {
         newClient.setLastName(client.getLastName());
         newClient.setDateOfBirthday(client.getDateOfBirthday());
         newClient.setAge(client.getAge());
-        newClient.setPassword(passwordEncoder.encode(client.getPassword()));
+        newClient.setPassword(client.getPassword());
         newClient.setNationality(client.getNationality());
         newClient.setTelephoneNumber(client.getTelephoneNumber());
         newClient.setAccountsIDs(client.getAccountsIDs());
@@ -55,7 +54,7 @@ public class ClientService {
             existingClient.setLastName(client.getLastName());
             existingClient.setDateOfBirthday(client.getDateOfBirthday());
             existingClient.setAge(client.getAge());
-            existingClient.setPassword(passwordEncoder.encode(client.getPassword()));
+            existingClient.setPassword(client.getPassword());
             existingClient.setNationality(client.getNationality());
             existingClient.setTelephoneNumber(client.getTelephoneNumber());
             existingClient.setAccountsIDs(client.getAccountsIDs());

@@ -4,7 +4,6 @@ package com.banque.users_microservice.service;
 import com.banque.users_microservice.entity.Employee;
 import com.banque.users_microservice.producer.UserEventProducer;
 import com.banque.users_microservice.repository.EmployeeRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +15,12 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final UserEventProducer userEventProducer;
-    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeService(EmployeeRepository employeeRepository, UserEventProducer userEventProducer, PasswordEncoder passwordEncoder) {
+
+    public EmployeeService(EmployeeRepository employeeRepository, UserEventProducer userEventProducer) {
         this.employeeRepository = employeeRepository;
         this.userEventProducer = userEventProducer;
-        this.passwordEncoder = passwordEncoder;
+
     }
 
     public Employee createEmployee(Employee employee) {
@@ -35,7 +34,7 @@ public class EmployeeService {
         newEmployee.setDepartment(employee.getDepartment());
         newEmployee.setNationality(employee.getNationality());
         newEmployee.setTelephoneNumber(employee.getTelephoneNumber());
-        newEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        newEmployee.setPassword(employee.getPassword());
         Employee savedEmployee = employeeRepository.save(newEmployee);
         userEventProducer.sendEmployeeEvent("CREATED",savedEmployee);
 
@@ -58,7 +57,7 @@ public class EmployeeService {
             existingEmployee.setDepartment(employee.getDepartment());
             existingEmployee.setNationality(employee.getNationality());
             existingEmployee.setTelephoneNumber(employee.getTelephoneNumber());
-            existingEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
+            existingEmployee.setPassword(employee.getPassword());
             Employee savedEmployee = employeeRepository.save(existingEmployee);
             userEventProducer.sendEmployeeEvent("UPDATED",savedEmployee);
             return savedEmployee;
