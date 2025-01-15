@@ -32,9 +32,12 @@ pipeline {
                 }
             }
         }
-         stage('test_Unitaire'){
+
+        stage('test_Unitaire') {
+            steps {
                 sh "mvn test"
             }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -44,29 +47,29 @@ pipeline {
                 }
             }
         }
-        
-       stage('Push to ECR') {
+
+        stage('Push to ECR') {
             steps {
                 script {
                     withCredentials([aws(credentialsId: 'aws-credentials')]) {
-                        
+
                         def awsCredentials = "-e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
-                        
+
                         docker.image('amazon/aws-cli').inside("--entrypoint='' ${awsCredentials}") {
                             sh """
                                 aws ecr get-login-password --region ${AWS_REGION} > ecr_password.txt
                             """
                         }
-                        
+
                         // Login à ECR
                         sh "cat ecr_password.txt | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
                         sh "rm ecr_password.txt"
-                        
+
                         // Tag et push des images
                         def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
                         def ecrImageLatest = "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
                         def ecrImageVersioned = "${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}"
-                        
+
                         sh """
                             docker tag ${localImageName} ${ecrImageLatest}
                             docker tag ${localImageName} ${ecrImageVersioned}
@@ -77,7 +80,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Cleanup') {
             steps {
                 script {
@@ -90,7 +93,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         failure {
             echo 'Pipeline failed! Cleaning up...'
