@@ -21,11 +21,11 @@ pipeline {
                 )
             }
         }
-         stage('Build & Deploy') {
+         /*stage('Build & Deploy') {
             steps {
                 sh 'mvn clean install -DskipTests=true'            
             }
-        }
+        }*/
         
         stage('Prepare Dependencies') {
             steps {
@@ -38,11 +38,11 @@ pipeline {
             }
         }
 
-        /*stage('test_Unitaire') {
+        stage('test_Unitaire') {
             steps {
-                sh "mvn test"
+                sh "mvn test -X"
             }
-        }*/
+        }
 
         stage('Build Docker Image') {
             steps {
