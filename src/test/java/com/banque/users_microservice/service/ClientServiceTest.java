@@ -1,24 +1,28 @@
 package com.banque.users_microservice.service;
 
+import com.banque.events.AccountCreatedEvent;
 import com.banque.users_microservice.entity.Client;
-import com.banque.users_microservice.entity.Status;
 import com.banque.users_microservice.producer.UserEventProducer;
 import com.banque.users_microservice.repository.ClientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.mockito.MockitoAnnotations;
 
-import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class ClientServiceTest {
+class ClientServiceTest {
 
     @Mock
     private ClientRepository clientRepository;
@@ -27,129 +31,185 @@ public class ClientServiceTest {
     private UserEventProducer userEventProducer;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private NotificationService notificationService;
 
     @InjectMocks
     private ClientService clientService;
 
-    private Client client;
+    private SimpleDateFormat dateFormat;
 
     @BeforeEach
     void setUp() {
-        client = new Client();
-        client.setId(UUID.randomUUID());
-        client.setUsername("testuser");
-        client.setFirstName("Test");
-        client.setLastName("User");
-        client.setDateOfBirthday(new Date());
-        client.setAge(30);
+        MockitoAnnotations.openMocks(this);
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    }
+
+    @Test
+    void testCreateClient() throws ParseException {
+        // Arrange
+        Client client = new Client();
+        client.setUsername("john.doe");
+        client.setFirstName("John");
+        client.setLastName("Doe");
+        client.setDateOfBirthday(dateFormat.parse("1990-01-01")); // Conversion en Date
+        client.setAge(33);
         client.setPassword("password");
-        client.setNationality("TestNation");
-        client.setTelephoneNumber("123-456-7890");
-        client.setStatus(Status.ACTIF);
+        client.setNationality("American");
+        client.setTelephoneNumber("1234567890");
         client.setAccountsIDs(Arrays.asList(UUID.randomUUID(), UUID.randomUUID()));
-    }
+        client.setStatus("ACTIVE");
 
-
-    @Test
-    void createClient_should_return_created_client(){
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(clientRepository.save(any(Client.class))).thenReturn(client);
+
+        // Act
         Client createdClient = clientService.createClient(client);
+
+        // Assert
         assertNotNull(createdClient);
-        assertEquals(client.getId(),createdClient.getId());
+        assertEquals("john.doe", createdClient.getUsername());
+        assertEquals("John", createdClient.getFirstName());
+        assertEquals("Doe", createdClient.getLastName());
+        assertEquals(dateFormat.parse("1990-01-01"), createdClient.getDateOfBirthday()); // Vérification de la date
         verify(clientRepository, times(1)).save(any(Client.class));
-        verify(userEventProducer, times(1)).sendClientEvent(eq("CREATED"), any(Client.class));
-    }
-
-
-    @Test
-    void getClientById_should_return_client_when_exist() {
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-
-        Optional<Client> foundClient = clientService.getClientById(client.getId());
-        assertTrue(foundClient.isPresent());
-        assertEquals(client.getId(), foundClient.get().getId());
-        verify(clientRepository, times(1)).findById(client.getId());
+        verify(userEventProducer, times(1)).sendClientEvent("CREATED", createdClient);
     }
 
     @Test
-    void getClientById_should_return_empty_when_not_exist() {
+    void testGetClientById() throws ParseException {
+        // Arrange
         UUID id = UUID.randomUUID();
-        when(clientRepository.findById(id)).thenReturn(Optional.empty());
+        Client client = new Client();
+        client.setId(id);
+        client.setUsername("john.doe");
+        client.setDateOfBirthday(dateFormat.parse("1990-01-01")); // Conversion en Date
 
+        when(clientRepository.findById(id)).thenReturn(Optional.of(client));
+
+        // Act
         Optional<Client> foundClient = clientService.getClientById(id);
-        assertFalse(foundClient.isPresent());
+
+        // Assert
+        assertTrue(foundClient.isPresent());
+        assertEquals(id, foundClient.get().getId());
+        assertEquals("john.doe", foundClient.get().getUsername());
+        assertEquals(dateFormat.parse("1990-01-01"), foundClient.get().getDateOfBirthday()); // Vérification de la date
         verify(clientRepository, times(1)).findById(id);
     }
 
+    @Test
+    void testUpdateClient() throws ParseException {
+        // Arrange
+        UUID id = UUID.randomUUID();
+        Client existingClient = new Client();
+        existingClient.setId(id);
+        existingClient.setUsername("john.doe");
+        existingClient.setDateOfBirthday(dateFormat.parse("1990-01-01")); // Conversion en Date
+
+        Client updatedClient = new Client();
+        updatedClient.setUsername("john.doe.updated");
+        updatedClient.setFirstName("John Updated");
+        updatedClient.setDateOfBirthday(dateFormat.parse("1995-05-05")); // Conversion en Date
+
+        when(clientRepository.findById(id)).thenReturn(Optional.of(existingClient));
+        when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
+
+        // Act
+        Client result = clientService.updateClient(id, updatedClient);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("john.doe.updated", result.getUsername());
+        assertEquals("John Updated", result.getFirstName());
+        assertEquals(dateFormat.parse("1995-05-05"), result.getDateOfBirthday()); // Vérification de la date
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, times(1)).save(any(Client.class));
+        verify(userEventProducer, times(1)).sendClientEvent("UPDATED", result);
+    }
 
     @Test
-    void getAllClients() {
-        when(clientRepository.findAll()).thenReturn(Arrays.asList(client, new Client()));
+    void testUpdateClient_NotFound() throws ParseException {
+        // Arrange
+        UUID id = UUID.randomUUID();
+        Client updatedClient = new Client();
+        updatedClient.setUsername("john.doe.updated");
+        updatedClient.setDateOfBirthday(dateFormat.parse("1995-05-05")); // Conversion en Date
 
-        List<Client> clients = clientService.getAllClients();
+        when(clientRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertEquals(2, clients.size());
+        // Act
+        Client result = clientService.updateClient(id, updatedClient);
+
+        // Assert
+        assertNull(result);
+        verify(clientRepository, times(1)).findById(id);
+        verify(clientRepository, never()).save(any(Client.class));
+        verify(userEventProducer, never()).sendClientEvent(anyString(), any(Client.class));
+    }
+
+    @Test
+    void testDeleteClient() {
+        // Arrange
+        UUID id = UUID.randomUUID();
+
+        // Act
+        clientService.deleteClient(id);
+
+        // Assert
+        verify(clientRepository, times(1)).deleteById(id);
+        verify(userEventProducer, times(1)).sendClientEvent("DELETED", new Client(id));
+    }
+
+    @Test
+    void testGetAllClients() throws ParseException {
+        // Arrange
+        Client client1 = new Client();
+        client1.setUsername("john.doe");
+        client1.setDateOfBirthday(dateFormat.parse("1990-01-01")); // Conversion en Date
+
+        Client client2 = new Client();
+        client2.setUsername("jane.doe");
+        client2.setDateOfBirthday(dateFormat.parse("1995-05-05")); // Conversion en Date
+
+        List<Client> clients = Arrays.asList(client1, client2);
+
+        when(clientRepository.findAll()).thenReturn(clients);
+
+        // Act
+        List<Client> result = clientService.getAllClients();
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(dateFormat.parse("1990-01-01"), result.get(0).getDateOfBirthday()); // Vérification de la date
+        assertEquals(dateFormat.parse("1995-05-05"), result.get(1).getDateOfBirthday()); // Vérification de la date
         verify(clientRepository, times(1)).findAll();
     }
 
-
     @Test
-    void updateClient_should_return_updated_client_when_exist() {
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        Client newClient = new Client();
-        newClient.setUsername("testuser2");
-        newClient.setFirstName("Test2");
-        newClient.setLastName("User2");
-        newClient.setDateOfBirthday(new Date());
-        newClient.setAge(32);
-        newClient.setPassword("password2");
-        newClient.setNationality("TestNation2");
-        newClient.setTelephoneNumber("123-456-7892");
-        newClient.setStatus(Status.INACTIF);
-        newClient.setAccountsIDs(Arrays.asList(UUID.randomUUID(), UUID.randomUUID()));
+    void testHandleAccountCreatedEvent() throws ParseException {
+        // Arrange
+        UUID clientId = UUID.randomUUID();
+        Client client = new Client();
+        client.setId(clientId);
+        client.setUsername("john.doe");
+        client.setFirstName("John");
+        client.setPassword("password");
 
-        when(clientRepository.save(any(Client.class))).thenReturn(newClient);
+        AccountCreatedEvent event = new AccountCreatedEvent();
+        event.setClientId(clientId);
+        event.setAccountNumber("123456789");
 
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
-        Client updateClient = clientService.updateClient(client.getId(), newClient);
-        assertNotNull(updateClient);
-        assertEquals(newClient.getUsername(),updateClient.getUsername());
-        verify(clientRepository, times(1)).findById(client.getId());
-        verify(clientRepository, times(1)).save(any(Client.class));
-        verify(userEventProducer, times(1)).sendClientEvent(eq("UPDATED"), any(Client.class));
+        // Act
+        clientService.handleAccountCreatedEvent(event);
+
+        // Assert
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(notificationService, times(1)).sendNotification(
+                eq("EMAIL"),
+                eq("john.doe"),
+                eq("Your Account is Ready!"),
+                contains("Dear John,\n\nYour account has been successfully created with account number 123456789.")
+        );
     }
-
-    @Test
-    void updateClient_should_return_null_when_not_exist() {
-        UUID id = UUID.randomUUID();
-        when(clientRepository.findById(id)).thenReturn(Optional.empty());
-
-        Client newClient = new Client();
-        newClient.setUsername("testuser2");
-        newClient.setFirstName("Test2");
-        newClient.setLastName("User2");
-        newClient.setDateOfBirthday(new Date());
-        newClient.setAge(32);
-        newClient.setPassword("password2");
-        newClient.setNationality("TestNation2");
-        newClient.setTelephoneNumber("123-456-7892");
-        newClient.setStatus(Status.INACTIF);
-        newClient.setAccountsIDs(Arrays.asList(UUID.randomUUID(), UUID.randomUUID()));
-
-        Client updateClient = clientService.updateClient(id, newClient);
-        assertNull(updateClient);
-        verify(clientRepository, times(1)).findById(id);
-
-    }
-    @Test
-    void deleteClient() {
-        doNothing().when(clientRepository).deleteById(client.getId());
-        clientService.deleteClient(client.getId());
-        verify(clientRepository, times(1)).deleteById(client.getId());
-        verify(userEventProducer, times(1)).sendClientEvent(eq("DELETED"), any(Client.class));
-    }
-
 }
