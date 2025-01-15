@@ -164,7 +164,7 @@ class ClientServiceTest {
 
         // Assert
         verify(clientRepository, times(1)).deleteById(id);
-        verify(userEventProducer, times(1)).sendClientEvent("DELETED", new Client(id));
+        verify(userEventProducer, times(1)).sendClientEvent(eq("DELETED"), argThat(client -> id.equals(client.getId())));
     }
 
     @Test

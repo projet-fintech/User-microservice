@@ -152,7 +152,7 @@ class EmployeeServiceTest {
 
         // Assert
         verify(employeeRepository, times(1)).deleteById(id);
-        verify(userEventProducer, times(1)).sendEmployeeEvent("DELETED", new Employee(id));
+        verify(userEventProducer, times(1)).sendEmployeeEvent(eq("DELETED"), argThat(employee -> id.equals(employee.getId())));
     }
 
     @Test
