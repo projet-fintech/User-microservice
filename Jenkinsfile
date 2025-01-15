@@ -21,6 +21,11 @@ pipeline {
                 )
             }
         }
+         stage('Build & Deploy') {
+            steps {
+                sh 'mvn clean install'            
+            }
+        }
         
         stage('Prepare Dependencies') {
             steps {
@@ -33,11 +38,11 @@ pipeline {
             }
         }
 
-        stage('test_Unitaire') {
+        /*stage('test_Unitaire') {
             steps {
                 sh "mvn test"
             }
-        }
+        }*/
 
         stage('Build Docker Image') {
             steps {
