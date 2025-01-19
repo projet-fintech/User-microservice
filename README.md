@@ -1,11 +1,11 @@
 ---
 
 ### **Users Microservice (README)**
+![image](https://github.com/user-attachments/assets/161d05bc-5cdf-4079-b864-83e5365a70c6)
+
 
 ```markdown
 # Users Microservice
-
-![image](https://github.com/user-attachments/assets/ddc9b3b3-eed7-4fea-a741-a51793167ae1)
 
 
 ## Description
