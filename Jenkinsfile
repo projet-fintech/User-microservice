@@ -41,11 +41,13 @@ pipeline {
             }
         }
 
-        stage('test_Unitaire') {
-            steps {
-                sh "mvn test -X"
-            }
+       stage('Unit Tests') {
+    steps {
+        script {
+           sh "mvn test -Dspring.profiles.active=test -X"
         }
+    }
+ }
 stage('SonarQube Analysis') {
             steps {
                 script {
