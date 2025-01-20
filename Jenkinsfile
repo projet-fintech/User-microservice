@@ -24,11 +24,11 @@ pipeline {
                 )
             }
         }
-         /*stage('Build & Deploy') {
+         stage('Build & Deploy') {
             steps {
                 sh 'mvn clean install -DskipTests=true'            
             }
-        }*/
+        }
         
         stage('Prepare Dependencies') {
             steps {
@@ -41,13 +41,13 @@ pipeline {
             }
         }
 
-       /*stage('Unit Tests') {
+       stage('Unit Tests') {
     steps {
         script {
            sh "mvn test -Dspring.profiles.active=test -X"
         }
     }
- }*/
+ }
 stage('SonarQube Analysis') {
             steps {
                 script {
@@ -66,7 +66,7 @@ stage('SonarQube Analysis') {
                 }
             }
         }
-        /*stage('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
                     def localImageName = "${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -107,7 +107,20 @@ stage('SonarQube Analysis') {
                 }
             }
         }
-*/
+stage('Deploy to EKS') {
+                    steps {
+                        script {
+                            withCredentials([aws(credentialsId: 'aws-credentials')]) {
+                                sh """
+                                    aws eks --region ${AWS_REGION} update-kubeconfig --name main-eks-cluster
+                                    kubectl apply -f kubernetes/user-deployement.yaml
+                                    kubectl apply -f kubernetes/user-service.yaml
+                                """
+                            }
+                        }
+                    }
+                }
+            }
         stage('Cleanup') {
             steps {
                 script {
