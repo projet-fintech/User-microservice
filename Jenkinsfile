@@ -11,7 +11,7 @@ pipeline {
         IMAGE_NAME = 'user-microservice'
          COMPONENT_NAME = 'UserMicroservice'
           SONAR_TOKEN = '39cc334a0a13dc54d616ab48a6949fae534f6b15'
-          SONAR_HOST = 'http://192.168.137.197:9000'
+          SONAR_HOST = '192.168.0.161:9000'
     }
 
     stages {
